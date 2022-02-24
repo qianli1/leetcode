@@ -1,0 +1,52 @@
+#include <vector>
+#include <string>
+
+
+using namespace std;
+/**
+* 本代码来自 CSON 官方视频课程，由 @CSON 提供
+* 题目来源： http://leetcode.com
+* CSON 致力于在 CS 领域内帮助中国人找到工作，让更多海内外国人受益
+* 讲师： Edward Shi
+* 官方网站： https://cspiration.com
+* 版权归 CSON 所有， 禁止 转载！
+*/
+
+class _848_ShiftingLetters {
+    /**
+    * 848. Shifting Letters
+    * We have a string S of lowercase letters, and an integer array shifts.
+
+    Call the shift of a letter, the next letter in the alphabet, (wrapping around so that 'z' becomes 'a'). 
+
+    For example, shift('a') = 'b', shift('t') = 'u', and shift('z') = 'a'.
+
+    Now for each shifts[i] = x, we want to shift the first i+1 letters of S, x times.
+
+    Return the final string after all such shifts to S are applied.
+
+    Example 1:
+
+    Input: S = "abc", shifts = [3,5,9]
+    Output: "rpl"
+    Explanation: 
+    We start with "abc".
+    After shifting the first 1 letters of S by 3, we have "dbc".
+    After shifting the first 2 letters of S by 5, we have "igc".
+    After shifting the first 3 letters of S by 9, we have "rpl", the answer.
+
+    time : O(n);
+    space : O(n);
+    */
+ public:
+  string shiftingLetters(string S, vector<int>& shifts) {
+    int sum = 0;
+    for (int i = shifts.size() - 1; i >= 0; i--) {
+        int cur = S[i] - 'a';
+        sum += shifts[i] % 26;
+        cur += sum;
+        S[i] = 'a' + (char)(cur % 26);
+    }
+    return S;  
+  }
+};

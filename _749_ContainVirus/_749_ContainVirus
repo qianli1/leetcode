@@ -1,0 +1,152 @@
+#include <vector>
+#include <string>
+#include <unordered_set>
+
+using namespace std;
+
+/**
+* 本代码来自 CSON 官方视频课程，由 @CSON 提供
+* 题目来源： http://leetcode.com
+* CSON 致力于在 CS 领域内帮助中国人找到工作，让更多海内外国人受益
+* 讲师： Edward Shi
+* 官方网站： https://cspiration.com
+* 版权归 CSON 所有， 禁止 转载！
+*/
+
+struct Region {
+    int wall;
+    unordered_set<int> infected;
+    unordered_set<int> unInfected;
+    
+    Region() {
+        this->wall = 0;
+    }
+};
+
+class _749_ContainVirus {
+    /**
+    * 749. Contain Virus
+    * A virus is spreading rapidly, and your task is to quarantine the infected area by installing walls.
+
+    The world is modeled as a 2-D array of cells, where 0 represents uninfected cells, and 1 represents cells contaminated with the virus. 
+    A wall (and only one wall) can be installed between any two 4-directionally adjacent cells, on the shared boundary.
+
+    Every night, the virus spreads to all neighboring cells in all four directions unless blocked by a wall. Resources are limited. Each day,
+     you can install walls around only one region -- the affected area (continuous block of infected cells) that threatens the most uninfected 
+     cells the following night. There will never be a tie.
+
+    Can you save the day? If so, what is the number of walls required? If not, and the world becomes fully infected, return the number of 
+    walls used.
+
+    Example 1:
+    Input: grid = 
+    [[0,1,0,0,0,0,0,1],
+    [0,1,0,0,0,0,0,1],
+    [0,0,0,0,0,0,0,1],
+    [0,0,0,0,0,0,0,0]]
+    Output: 10
+    Explanation:
+    There are 2 contaminated regions.
+    On the first day, add 5 walls to quarantine the viral region on the left. The board after the virus spreads is:
+
+    [[0,1,0,0,0,0,1,1],
+    [0,1,0,0,0,0,1,1],
+    [0,0,0,0,0,0,1,1],
+    [0,0,0,0,0,0,0,1]]
+
+    On the second day, add 5 walls to quarantine the viral region on the right. The virus is fully contained.
+    Example 2:
+    Input: grid = 
+    [[1,1,1],
+    [1,0,1],
+    [1,1,1]]
+    Output: 4
+    Explanation: Even though there is only one cell saved, there are 4 walls built.
+    Notice that walls are only built on the shared boundary of two different cells.
+    Example 3:
+    Input: grid = 
+    [[1,1,1,0,0,0,0,0,0],
+    [1,0,1,0,1,1,1,1,1],
+    [1,1,1,0,0,0,0,0,0]]
+    Output: 13
+    Explanation: The region on the left only builds two new walls.
+
+    */
+ public:
+  int containVirus(vector<vector<int>>& grid) {
+    if (grid.empty() || grid.size() == 0) {
+        return 0;
+    }
+    
+    int m = grid.size();
+    int n = grid[0].size();
+    
+    int res = 0;
+    while (true) {
+        vector<Region> regions;
+        vector<vector<bool>> visited(m, vector<bool>(n, false));
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (grid[i][j] == 1 && !visited[i][j]) {
+                    Region region;
+                    dfs(grid, i, j, visited, region);
+                    if (region.unInfected.size() > 0) {
+                        regions.push_back(region);
+                    }
+                }
+            }
+        }
+        if (regions.size() == 0) {
+            break;
+        }
+        sort(regions.begin(), regions.end(), [](Region& a, Region& b) {
+            return (a.unInfected.size() > b.unInfected.size());
+        });
+        
+        Region region = regions[0];
+        regions.erase(regions.begin());
+        res += region.wall;
+        
+        for (int neighbor : region.infected) {
+            int i = neighbor / n;
+            int j = neighbor % n;
+            grid[i][j] = 2;
+        }
+        
+        for (Region reg : regions) {
+            for (int neighbor : reg.unInfected) {
+                int i = neighbor / n;
+                int j = neighbor % n;
+                grid[i][j] = 1;
+            }
+        }
+    }
+    return res;
+  }
+
+  void dfs(vector<vector<int>>& grid, int i, int j, vector<vector<bool>>& visited, Region& region) {
+    int m = grid.size();
+    int n = grid[0].size();
+    
+    if (i < 0 || i >= m || j < 0 || j >= n || grid[i][j] == 2) {
+        return;
+    }
+    if (grid[i][j] == 1) {
+        region.infected.insert(i * n + j);
+        if (visited[i][j]) {
+            return;
+        }
+    }
+    visited[i][j] = true;
+    if (grid[i][j] == 0) {
+        region.wall++;
+        region.unInfected.insert(i * n + j);
+        return;
+    }
+    
+    dfs(grid, i + 1, j, visited, region);
+    dfs(grid, i - 1, j, visited, region);
+    dfs(grid, i, j + 1, visited, region);
+    dfs(grid, i, j - 1, visited, region);
+  }
+};

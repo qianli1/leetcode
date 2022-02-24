@@ -1,0 +1,95 @@
+#include <vector>
+#include <string>
+#include <queue>
+#include <unordered_map>
+#include <map>
+
+using namespace std;
+/**
+* 本代码来自 CSON 官方视频课程，由 @CSON 提供
+* 题目来源： http://leetcode.com
+* CSON 致力于在 CS 领域内帮助中国人找到工作，让更多海内外国人受益
+* 讲师： Edward Shi
+* 官方网站： https://cspiration.com
+* 版权归 CSON 所有， 禁止 转载！
+*/
+
+class _846_HandofStraights {
+    /**
+    * 846. Hand of Straights
+    * Alice has a hand of cards, given as an array of integers.
+
+    Now she wants to rearrange the cards into groups so that each group is size W, and consists of W consecutive cards.
+
+    Return true if and only if she can.
+
+    Example 1:
+
+    Input: hand = [1,2,3,6,2,3,4,7,8], W = 3
+    Output: true
+    Explanation: Alice's hand can be rearranged as [1,2,3],[2,3,4],[6,7,8].
+    Example 2:
+
+    Input: hand = [1,2,3,4,5], W = 4
+    Output: false
+    Explanation: Alice's hand can't be rearranged into groups of 4.
+
+    time : O(n);
+    space : O(n);
+    */
+ public:
+  bool isNStraightHand(vector<int>& hand, int W) {
+    map<int, int> mp;
+    for (int num : hand) {
+        mp[num]++;
+    }
+    for (auto it = mp.begin(); it != mp.end(); it++) {
+        if (it->second > 0) {
+            for (int i = W - 1; i >= 0; i--) {
+                if (mp[it->first + i] < it->second) {
+                    return false;
+                }
+                mp[it->first + i] = mp[it->first + i] - it->second;
+            }
+        }
+    }
+    return true;
+  }
+
+  bool isNStraightHand2(vector<int>& hand, int W) {
+    unordered_map<int, int> mp;
+    for (int num : hand) {
+        mp[num]++;
+    }
+    
+    queue<int> q;
+    for (auto &v : mp) {
+        if (!mp.count(v.first - 1)) {
+            q.push(v.first);
+        }
+    }
+    
+    while (!q.empty()) {
+        int start = q.front();
+        q.pop();
+        for (int i = start; i < start + W; i++) {
+            if (!mp.count(i)) {
+                return false;
+            }
+            if (mp[i] - 1 > 0) {
+                mp[i]--;
+                if (!mp.count(i - 1)) {
+                    q.push(i);
+                }
+            }  else {
+                    mp.erase(i);
+            }
+        }
+        if (!mp.count(start + W - 1) && mp.count(start + W)) {
+                q.push(start + W);
+        }
+    }
+    return true;
+  }
+
+};

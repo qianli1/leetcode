@@ -1,0 +1,67 @@
+#include <vector>
+#include <string>
+#include <unordered_map>
+
+using namespace std;
+/**
+* 本代码来自 CSON 官方视频课程，由 @CSON 提供
+* 题目来源： http://leetcode.com
+* CSON 致力于在 CS 领域内帮助中国人找到工作，让更多海内外国人受益
+* 讲师： Edward Shi
+* 官方网站： https://cspiration.com
+* 版权归 CSON 所有， 禁止 转载！
+*/
+
+class _837_New21Game {
+    /**
+    * 837. New 21 Game
+    * Alice plays the following game, loosely based on the card game "21".
+
+    Alice starts with 0 points, and draws numbers while she has less than K points.  During each draw, she gains an integer number 
+    of points randomly from the range [1, W], where W is an integer.  Each draw is independent and the outcomes have equal probabilities.
+
+    Alice stops drawing numbers when she gets K or more points.  What is the probability that she has N or less points?
+
+    Example 1:
+
+    Input: N = 10, K = 1, W = 10
+    Output: 1.00000
+    Explanation:  Alice gets a single card, then stops.
+    Example 2:
+
+    Input: N = 6, K = 1, W = 10
+    Output: 0.60000
+    Explanation:  Alice gets a single card, then stops.
+    In 6 out of W = 10 possibilities, she is at or below N = 6 points.
+    Example 3:
+
+    Input: N = 21, K = 17, W = 10
+    Output: 0.73278
+
+    time : O(n);
+    space : O(n);
+    */
+ public:
+  double new21Game(int N, int K, int W) {
+    if (K == 0 || N >= K + W) {
+        return 1;
+    }
+    vector<double> dp(N + 1);
+    dp[0] = 1;
+    
+    double wSum = 1;
+    double res = 0;
+    for (int i = 1; i <= N; i++) {
+        dp[i] = wSum / W;
+        if (i < K) {
+            wSum += dp[i];
+        } else {
+            res += dp[i];
+        }
+        if (i - W >= 0) {
+            wSum -= dp[i - W];
+        }
+    }
+    return res;
+  }
+};

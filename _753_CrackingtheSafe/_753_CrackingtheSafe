@@ -1,0 +1,75 @@
+#include <vector>
+#include <string>
+#include <unordered_set>
+
+using namespace std;
+/**
+* 本代码来自 CSON 官方视频课程，由 @CSON 提供
+* 题目来源： http://leetcode.com
+* CSON 致力于在 CS 领域内帮助中国人找到工作，让更多海内外国人受益
+* 讲师： Edward Shi
+* 官方网站： https://cspiration.com
+* 版权归 CSON 所有， 禁止 转载！
+*/
+
+class _753_CrackingtheSafe {
+    /**
+    * 753. Cracking the Safe
+    * There is a box protected by a password. The password is a sequence of n digits where each digit can be one of the first k 
+    * digits 0, 1, ..., k-1.
+
+    While entering a password, the last n digits entered will automatically be matched against the correct password.
+
+    For example, assuming the correct password is "345", if you type "012345", the box will open because the correct password matches 
+    the suffix of the entered password.
+
+    Return any password of minimum length that is guaranteed to open the box at some point of entering it.
+
+    Example 1:
+
+    Input: n = 1, k = 2
+    Output: "01"
+    Note: "10" will be accepted too.
+    Example 2:
+
+    Input: n = 2, k = 2
+    Output: "00110"
+    Note: "01100", "10011", "11001" will be accepted too.
+
+    time : O(k^n);
+    space : O(k^n);
+    */
+ public:
+  string crackSafe(int n, int k) {
+    string s;
+    int total = (int) pow(k, n);
+    for (int i = 0; i < n; i++) {
+        s += '0';
+    }
+    unordered_set<string> visited;
+    visited.insert(s);
+    helper(s, visited, total, n, k);
+    
+    return s;
+  }
+
+  bool helper(string &s, unordered_set<string> &visited, int target, int n, int k) {
+    if (visited.size() == target) {
+        return true;
+    }
+    string prev = s.substr(s.size() - n + 1, n - 1);
+    for (int i = 0; i < k; i++) {
+        string next = prev + to_string(i);
+        if (!visited.count(next)) {
+            visited.insert(next);
+            s += to_string(i);
+            if (helper(s, visited, target, n, k)) {
+                return true;
+            }
+            visited.erase(next);
+            s.erase(s.end() - 1, s.end());
+        }
+    }
+    return false;
+  }
+};

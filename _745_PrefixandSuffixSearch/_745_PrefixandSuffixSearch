@@ -1,0 +1,143 @@
+#include <vector>
+#include <string>
+#include <unordered_map>
+
+using namespace std;
+/**
+* 本代码来自 CSON 官方视频课程，由 @CSON 提供
+* 题目来源： http://leetcode.com
+* CSON 致力于在 CS 领域内帮助中国人找到工作，让更多海内外国人受益
+* 讲师： Edward Shi
+* 官方网站： https://cspiration.com
+* 版权归 CSON 所有， 禁止 转载！
+*/
+struct TrieNode {
+    vector<TrieNode*> children;
+    int weight;
+    TrieNode() {
+        this->children.resize(27);
+        this->weight = 0;
+    }
+};
+
+class _745_PrefixandSuffixSearch {
+    /**
+    * 745. Prefix and Suffix Search
+    * Design a special dictionary which has some words and allows you to search the words in it by a prefix and a suffix.
+
+    Implement the WordFilter class:
+
+    WordFilter(string[] words) Initializes the object with the words in the dictionary.
+    f(string prefix, string suffix) Returns the index of the word in the dictionary which has the prefix prefix and the suffix suffix. 
+    If there is more than one valid index, return the largest of them. If there is no such word in the dictionary, return -1.
+    
+    Example 1:
+
+    Input
+    ["WordFilter", "f"]
+    [[["apple"]], ["a", "e"]]
+    Output
+    [null, 0]
+
+    Explanation
+    WordFilter wordFilter = new WordFilter(["apple"]);
+    wordFilter.f("a", "e"); // return 0, because the word at index 0 has prefix = "a" and suffix = 'e".
+
+    time : O(n);
+    space : O(n);
+    */
+ private:
+  unordered_map<string, int> mp;
+ public:
+  WordFilter(vector<string>& words) {
+    for (int w = 0; w < words.size(); w++) {
+        for (int i = 0; i <= 10 && i <= words[w].size(); i++) {
+            for (int j = 0; j <= 10 && j <= words[w].size(); j++) {
+                mp[words[w].substr(0, i) + "#" + words[w].substr(words[w].size() - j)] = w;
+            }
+        }
+    }
+  }
+
+  int f(string prefix, string suffix) {
+    if (mp.count(prefix + "#" + suffix)) {
+        return mp[prefix + "#" + suffix];
+    } else {
+        return -1;
+    }
+  }
+
+ private:
+  unordered_map<string, vector<int>> mapPrefix;
+  unordered_map<string, vector<int>> mapSuffix;
+
+ public:
+  WordFilter2(vector<string>& words) {
+    for (int w = 0; w < words.size(); w++) {
+        for (int i = 0; i <= 10 && i <= words[w].size(); i++) {
+            string s = words[w].substr(0, i);
+            mapPrefix[s].push_back(w);
+        }
+        for (int i = 0; i <= 10 && i <= words[w].size(); i++) {
+            string s = words[w].substr(words[w].size() - i);
+            mapSuffix[s].push_back(w);
+        }
+    }
+  }
+
+  int f2(string prefix, string suffix) {
+    if (!mapPrefix.count(prefix) || !mapSuffix.count(suffix)) {
+        return -1;
+    }
+    vector<int> p = mapPrefix[prefix];
+    vector<int> s = mapSuffix[suffix];
+    
+    int i = p.size() - 1;
+    int j = s.size() - 1;
+    while (i >= 0 && j >= 0) {
+        if (p[i] < s[j]) {
+            j--;
+        } else if (p[i] > s[j]) {
+            i--;
+        } else {
+            return p[i];
+        }
+    }
+    return -1;
+  }
+
+ private:
+  TrieNode* root;
+
+ public:
+  WordFilter3(vector<string>& words) {
+    root = new TrieNode();
+    for (int w = 0; w < words.size(); w++) {
+        string word = words[w] + "{";
+        for (int i = 0; i < word.size(); i++) {
+            TrieNode* cur = root;
+            cur->weight = w;
+            for (int j = i; j < 2 * word.size() - 1; j++) {
+                int k = word[j % word.size()] - 'a';
+                if (cur->children[k] == NULL) {
+                    cur->children[k] = new TrieNode();
+                }
+                cur = cur->children[k];
+                cur->weight = w;
+            }
+        }
+    }
+  }
+
+  int f3(string prefix, string suffix) {
+    TrieNode* cur = root;
+    for (char letter : suffix + '{' + prefix) {
+        if (cur->children[letter - 'a'] == NULL) {
+            return -1;
+        }
+        cur = cur->children[letter - 'a'];
+    }
+    return cur->weight;
+  }
+
+};

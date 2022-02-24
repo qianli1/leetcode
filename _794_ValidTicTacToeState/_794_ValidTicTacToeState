@@ -1,0 +1,100 @@
+#include <vector>
+#include <string>
+#include <unordered_set>
+
+using namespace std;
+/**
+* 本代码来自 CSON 官方视频课程，由 @CSON 提供
+* 题目来源： http://leetcode.com
+* CSON 致力于在 CS 领域内帮助中国人找到工作，让更多海内外国人受益
+* 讲师： Edward Shi
+* 官方网站： https://cspiration.com
+* 版权归 CSON 所有， 禁止 转载！
+*/
+
+class _794_ValidTicTacToeState {
+    /**
+    * 794. Valid Tic-Tac-Toe State
+    * A Tic-Tac-Toe board is given as a string array board. Return True if and only if it is possible to reach this board position 
+    * during the course of a valid tic-tac-toe game.
+
+    The board is a 3 x 3 array, and consists of characters " ", "X", and "O".  The " " character represents an empty square.
+
+    Here are the rules of Tic-Tac-Toe:
+
+    Players take turns placing characters into empty squares (" ").
+    The first player always places "X" characters, while the second player always places "O" characters.
+    "X" and "O" characters are always placed into empty squares, never filled ones.
+    The game ends when there are 3 of the same (non-empty) character filling any row, column, or diagonal.
+    The game also ends if all squares are non-empty.
+    No more moves can be played if the game is over.
+    Example 1:
+    Input: board = ["O  ", "   ", "   "]
+    Output: false
+    Explanation: The first player always plays "X".
+
+    Example 2:
+    Input: board = ["XOX", " X ", "   "]
+    Output: false
+    Explanation: Players take turns making moves.
+
+    Example 3:
+    Input: board = ["XXX", "   ", "OOO"]
+    Output: false
+
+    Example 4:
+    Input: board = ["XOX", "O O", "XOX"]
+    Output: true
+
+    time : O(n^2);
+    space : O(1);
+    */
+ public:
+  bool validTicTacToe(vector<string>& board) {
+    if (board.size() == 0) {
+        return false;
+    }
+    bool xWin = isGameOver(board, 'X');
+    bool oWin = isGameOver(board, 'O');
+    
+    int turns = 0;
+    for (int i = 0; i < board.size(); i++) {
+        for (int j = 0; j < board[0].size(); j++) {
+            if (board[i][j] == 'X') {
+                turns++;
+            } else if (board[i][j] == 'O') {
+                turns--;
+            }
+        }
+    }
+    if (turns < 0 || turns > 1 || turns == 0 && xWin || turns == 1 && oWin) {
+        return false;
+    }
+    return true;
+  }
+
+  bool isGameOver(vector<string>& board, char player) {
+    for (int i = 0; i < 3; i++) {
+        if (board[i][0] == player
+            && board[i][0] == board[i][1]
+            && board[i][1] == board[i][2]) {
+            return true;
+        } 
+    }
+    for (int j = 0; j < 3; j++) {
+        if (board[0][j] == player
+            && board[0][j] == board[1][j]
+            && board[1][j] == board[2][j]) {
+            return true;
+        }
+    }
+    if (board[1][1] == player 
+        && (board[0][0] == board[1][1]
+        && board[1][1] == board[2][2]
+        || board[0][2] == board[1][1]
+        && board[1][1] == board[2][0])) {
+            return true;
+    }
+    return false;
+  }
+};
